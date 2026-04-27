@@ -63,10 +63,17 @@
     // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE ANDA
     const api_url = "https://script.google.com/macros/s/AKfycbyimpJ0gEbGYtiHT379VHIbxLq0Zn3SusaMQut7JwALI6jeqshf0jIqB_7q5GHTZEpNaQ/exec";
 
-    async function fetchData() {
-        try {
-            const response = await fetch(api_url);
-            const data = await response.json();
+        async function fetchData() {
+            try {
+                // Menambahkan mode cors dan cache no-store agar data selalu fresh
+                const response = await fetch(api_url, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
             
             // Update Total
             document.getElementById('totalDisplay').innerText = "Rp " + data.totalDonasi.toLocaleString('id-ID');
