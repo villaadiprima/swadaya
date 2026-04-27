@@ -6,43 +6,81 @@
     <title>Monitoring Donasi Villa Adiprima</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { background-color: #f0f2f5; font-family: 'Inter', sans-serif; padding: 20px 0; }
-        .container { max-width: 700px; }
-        .header-card { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; border-radius: 15px; padding: 30px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .total-amount { font-size: 2.5rem; font-weight: 800; color: #18bc9c; margin: 10px 0; }
-        .data-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .table thead { background-color: #f8f9fa; }
-        .bank-info { font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px dashed #18bc9c; }
-        #loader { display: block; text-align: center; padding: 50px; }
+        body { background-color: #f0f2f5; font-family: 'Inter', sans-serif; padding: 10px 0; }
+        .container { max-width: 600px; padding: 0 15px; }
+        
+        /* Header Card dioptimasi untuk Mobile */
+        .header-card { 
+            background: linear-gradient(135deg, #2c3e50, #34495e); 
+            color: white; 
+            border-radius: 12px; 
+            padding: 20px 15px; 
+            text-align: center; 
+            margin-bottom: 15px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+        }
+        
+        .header-card h4 { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+        .header-card h5 { font-size: 0.85rem; opacity: 0.8; letter-spacing: 1px; }
+        
+        /* Ukuran Nominal disesuaikan agar tidak pecah di HP */
+        .total-amount { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: #18bc9c; 
+            margin: 8px 0; 
+        }
+        
+        .data-card { background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        
+        /* Tabel lebih ringkas */
+        .table { font-size: 0.9rem; }
+        .table td { padding: 12px 8px; }
+        
+        .bank-info { 
+            font-size: 0.8rem; 
+            background: rgba(255,255,255,0.08); 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-top: 15px; 
+            border: 1px dashed #18bc9c; 
+            line-height: 1.5;
+        }
+        
+        #loader { display: block; text-align: center; padding: 40px; }
         #content { display: none; }
+        
+        /* Utility */
+        .text-small { font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="loader">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2">Memuat data donasi...</p>
+        <div class="spinner-border spinner-border-sm text-primary" role="status"></div>
+        <p class="mt-2 text-muted" style="font-size: 0.9rem;">Memuat data donasi...</p>
     </div>
 
     <div id="content">
         <div class="header-card">
-            <h4 class="text-uppercase" style="letter-spacing: 2px;">Swadaya Masyarakat Untuk Perbaikan Jalan</h4>
-            <h5 class="text-uppercase" style="letter-spacing: 2px;">Total Dana Terkumpul</h5>
+            <h4 class="text-uppercase">Swadaya Masyarakat<br>Perbaikan Jalan Utama</h4>
+            <h5>Total Dana Terkumpul</h5>
             <div class="total-amount" id="totalDisplay">Rp 0</div>
-            <p class="mb-0">Perum Villa Adiprima - RW 15</p>
+            <p class="mb-0 text-small">Perum Villa Adiprima - RW 15</p>
+            
             <div class="bank-info">
-                Transfer BCA: <strong>0380096919</strong><br>
+                Donasi via <strong>BCA 0380096919</strong><br>
                 a.n DITA BAGUS KRISTANTO
             </div>
         </div>
 
         <div class="data-card">
-            <h6 class="fw-bold mb-3">Daftar Donatur Terkini:</h6>
+            <h6 class="fw-bold mb-3" style="font-size: 0.95rem;">Daftar Donatur Terkini:</h6>
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr style="font-size: 0.8rem;">
                             <th>No</th>
                             <th>Nama</th>
                             <th class="text-end">Nominal</th>
@@ -54,14 +92,13 @@
             </div>
         </div>
         
-        <p class="text-center text-muted mt-4" style="font-size: 0.8rem;">
+        <p class="text-center text-muted mt-3 text-small">
             Data diperbarui secara otomatis dari sistem pengurus.
         </p>
     </div>
 </div>
 
 <script>
-    // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE ANDA
     const api_url = "https://script.google.com/macros/s/AKfycbyimpJ0gEbGYtiHT379VHIbxLq0Zn3SusaMQut7JwALI6jeqshf0jIqB_7q5GHTZEpNaQ/exec";
 
     async function fetchData() {
@@ -79,19 +116,18 @@
             data.donatur.forEach(item => {
                 let row = `<tr>
                     <td>${item.no}</td>
-                    <td><strong>${item.nama}</strong><br><small class="text-muted">${item.tanggal}</small></td>
+                    <td><strong>${item.nama}</strong><br><span class="text-muted text-small">${item.tanggal}</span></td>
                     <td class="text-end fw-bold text-success">Rp ${item.nominal.toLocaleString('id-ID')}</td>
                 </tr>`;
                 tbody.innerHTML += row;
             });
 
-            // Tampilkan konten, sembunyikan loader
             document.getElementById('loader').style.display = 'none';
             document.getElementById('content').style.display = 'block';
 
         } catch (error) {
-            console.error("Gagal memuat data:", error);
-            document.getElementById('loader').innerHTML = "<p class='text-danger'>Gagal memuat data. Pastikan URL API benar dan izin akses diatur ke 'Anyone'.</p>";
+            console.error("Gagal:", error);
+            document.getElementById('loader').innerHTML = "<p class='text-danger text-small'>Gagal memuat data. Cek koneksi atau izin Apps Script.</p>";
         }
     }
 
