@@ -9,25 +9,10 @@
         body { background-color: #f0f2f5; font-family: 'Inter', sans-serif; padding: 20px 0; }
         .container { max-width: 700px; }
         .header-card { background: linear-gradient(135deg, #2c3e50, #34495e); color: white; border-radius: 15px; padding: 30px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .total-amount { font-size: 2.8rem; font-weight: 800; color: #18bc9c; margin: 5px 0; }
+        .total-amount { font-size: 2.5rem; font-weight: 800; color: #18bc9c; margin: 10px 0; }
         .data-card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .table thead { background-color: #f8f9fa; }
         .bank-info { font-size: 0.9rem; background: rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; margin-top: 15px; border: 1px dashed #18bc9c; }
-        
-        /* Gaya Baru untuk Teks Total di Atas List */
-        .summary-text { 
-            background-color: #e8f8f5; 
-            color: #117a65; 
-            padding: 10px 15px; 
-            border-radius: 10px; 
-            font-weight: bold; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            margin-bottom: 15px;
-            border-left: 5px solid #18bc9c;
-        }
-
         #loader { display: block; text-align: center; padding: 50px; }
         #content { display: none; }
     </style>
@@ -42,8 +27,8 @@
 
     <div id="content">
         <div class="header-card">
-            <h5 class="text-uppercase" style="letter-spacing: 2px; font-size: 0.9rem;">Dana Terkumpul Saat Ini</h5>
-            <div class="total-amount" id="totalDisplayTop">Rp 0</div>
+            <h5 class="text-uppercase" style="letter-spacing: 2px;">Total Dana Terkumpul</h5>
+            <div class="total-amount" id="totalDisplay">Rp 0</div>
             <p class="mb-0">Perum Villa Adiprima - RW 15</p>
             <div class="bank-info">
                 Transfer BCA: <strong>0380096919</strong><br>
@@ -52,19 +37,14 @@
         </div>
 
         <div class="data-card">
-            <div class="summary-text">
-                <span>TOTAL TERKUMPUL:</span>
-                <span id="totalDisplaySummary" style="font-size: 1.2rem;">Rp 0</span>
-            </div>
-
-            <h6 class="fw-bold mb-3 text-secondary">DAFTAR DONATUR TERKINI:</h6>
+            <h6 class="fw-bold mb-3">Daftar Donatur Terkini:</h6>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th width="10%">No</th>
-                            <th width="60%">Nama Donatur</th>
-                            <th width="30%" class="text-end">Nominal</th>
+                            <th>No</th>
+                            <th>Nama</th>
+                            <th class="text-end">Nominal</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -74,63 +54,50 @@
         </div>
         
         <p class="text-center text-muted mt-4" style="font-size: 0.8rem;">
-            Terima kasih atas bantuan Bapak/Ibu.<br>
-            Data diperbarui secara otomatis dari sistem pengurus RW 15.
+            Data diperbarui secara otomatis dari sistem pengurus.
         </p>
     </div>
 </div>
 
 <script>
-    // URL API Google Apps Script Anda
+    // GANTI URL DI BAWAH INI DENGAN URL WEB APP GOOGLE ANDA
     const api_url = "https://script.google.com/macros/s/AKfycbyimpJ0gEbGYtiHT379VHIbxLq0Zn3SusaMQut7JwALI6jeqshf0jIqB_7q5GHTZEpNaQ/exec";
 
-    async function fetchData() {
-        try {
-            // Memanggil data dengan mode redirect follow untuk Google Script
-            const response = await fetch(api_url, {
-                method: 'GET',
-                redirect: 'follow'
-            });
+        async function fetchData() {
+            try {
+                // Menambahkan mode cors dan cache no-store agar data selalu fresh
+                const response = await fetch(api_url, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                
+                if (!response.ok) throw new Error('Network response was not ok');
+                
+                const data = await response.json();
             
-            if (!response.ok) throw new Error('Gagal koneksi ke server');
+            // Update Total
+            document.getElementById('totalDisplay').innerText = "Rp " + data.totalDonasi.toLocaleString('id-ID');
             
-            const data = await response.json();
-            const formattedTotal = "Rp " + data.totalDonasi.toLocaleString('id-ID');
-            
-            // Update Nominal di Header
-            document.getElementById('totalDisplayTop').innerText = formattedTotal;
-            
-            // Update Nominal di Atas Tabel
-            document.getElementById('totalDisplaySummary').innerText = formattedTotal;
-            
-            // Update Tabel List Donatur
+            // Update Table
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = "";
             
-            if (data.donatur.length === 0) {
-                tbody.innerHTML = "<tr><td colspan='3' class='text-center'>Belum ada data donasi</td></tr>";
-            } else {
-                data.donatur.forEach(item => {
-                    let row = `<tr>
-                        <td>${item.no}</td>
-                        <td><strong>${item.nama}</strong><br><small class="text-muted">${item.tanggal}</small></td>
-                        <td class="text-end fw-bold text-success">Rp ${item.nominal.toLocaleString('id-ID')}</td>
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
-            }
+            data.donatur.forEach(item => {
+                let row = `<tr>
+                    <td>${item.no}</td>
+                    <td><strong>${item.nama}</strong><br><small class="text-muted">${item.tanggal}</small></td>
+                    <td class="text-end fw-bold text-success">Rp ${item.nominal.toLocaleString('id-ID')}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
 
-            // Sembunyikan Loading, Tampilkan Konten
+            // Tampilkan konten, sembunyikan loader
             document.getElementById('loader').style.display = 'none';
             document.getElementById('content').style.display = 'block';
 
         } catch (error) {
             console.error("Gagal memuat data:", error);
-            document.getElementById('loader').innerHTML = `
-                <div class='alert alert-danger'>
-                    <strong>Gagal Memuat Data!</strong><br>
-                    Pastikan Anda telah mempublikasikan Google Apps Script sebagai 'Anyone' dan menggunakan URL yang benar.
-                </div>`;
+            document.getElementById('loader').innerHTML = "<p class='text-danger'>Gagal memuat data. Pastikan URL API benar dan izin akses diatur ke 'Anyone'.</p>";
         }
     }
 
